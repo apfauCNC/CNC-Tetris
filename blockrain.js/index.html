@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+
+  <title>CNC Cabinetry: Tetris</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+  <link rel="shortcut icon" href="assets/images/CNCLogosquare.png">
+
+  <link href='http://fonts.googleapis.com/css?family=Play:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="src/blockrain.css">
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-21195039-3', 'aerolab.github.io');
+    ga('require', 'displayfeatures');
+    ga('require', 'linkid', 'linkid.js');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+
+<section id="examples">
+  <article id="above-game">
+    <div class="cncLogo">
+      <img src="assets/images/favicon.png">
+    </div>
+  </article>
+  <article id="example-slider">
+    <div class="example">
+      <div class="theme">Collection: <strong>"Luxor"</strong></div>
+      <div class="instructions">
+        Use Arrow Keys
+        <div class="keyboard">
+          <div class="key key-up"></div>
+          <div class="key key-left"></div>
+          <div class="key key-down"></div>
+          <div class="key key-right"></div>
+        </div>
+      </div>
+      <div class="game" id="tetris-demo"></div>
+    </div>
+    <div class="buttons">
+      <a href="" class="btn btn-prev">Previous</a>
+      <a href="" class="btn btn-next">Next</a>
+    </div>
+  </article>
+
+</section>
+
+
+
+<script src="assets/js/jquery-1.11.1.min.js"></script>
+<script src="src/blockrain.jquery.libs.js"></script>
+<script src="src/blockrain.jquery.src.js"></script>
+<script src="src/blockrain.jquery.themes.js"></script>
+
+<script>
+  var $cover = $('#cover-tetris').blockrain({
+    autoplay: true,
+    autoplayRestart: true,
+    speed: 100,
+    autoBlockWidth: true,
+    autoBlockSize: 25,
+    theme: 'candy'
+  });
+  
+
+  var versusSpeed = 100;
+
+  var $versus1 = $('#tetris-versus-1 .game').blockrain({
+    autoplay: true,
+    autoplayRestart: true,
+    speed: versusSpeed,
+    onGameOver: function() {
+      $versus1.blockrain('restart');
+      $versus2.blockrain('restart');
+      var $score = $versus2.parent().find('.score');
+      $score.text( parseInt($score.text()) + 1 );
+    }
+  });
+  var $versus2 = $('#tetris-versus-2 .game').blockrain({
+    autoplay: true,
+    autoplayRestart: true,
+    speed: versusSpeed,
+    onGameOver: function() {
+      $versus1.blockrain('restart');
+      $versus2.blockrain('restart');
+      var $score = $versus1.parent().find('.score');
+      $score.text( parseInt($score.text()) + 1 );
+    }
+  });
+
+
+  var $demo = $('#tetris-demo').blockrain({
+    speed: 20,
+    theme: 'Luxor',
+    onStart: function() {
+      ga( 'send', 'event', 'tetris', 'started');
+    },
+    onLine: function() {
+      ga( 'send', 'event', 'tetris', 'line');
+    },
+    onGameOver: function(score){
+      ga( 'send', 'event', 'tetris', 'over', score);
+    }
+  });
+
+  $('#example-slider').find('.btn-next').click(function(event){
+    event.preventDefault();
+    switchDemoTheme(true);
+  });
+  $('#example-slider').find('.btn-prev').click(function(event){
+    event.preventDefault();
+    switchDemoTheme(false);
+  });
+
+  function switchDemoTheme(next) {
+
+    var themes = Object.keys(BlockrainThemes);
+
+    var currentTheme = $demo.blockrain('theme');
+    var currentIx = themes.indexOf(currentTheme);
+
+    if( next ) { currentIx++; }
+    else { currentIx--; }
+
+    if( currentIx >= themes.length ){ currentIx = 0; }
+    if( currentIx < 0 ){ currentIx = themes.length-1; }
+
+    $demo.blockrain('theme', themes[currentIx]);
+    $('#example-slider .theme strong').text( '"'+themes[currentIx]+'"' );
+  }
+</script>
+
+</body>
+</html>
